@@ -10,14 +10,13 @@ import anvil.tz
 from datetime import datetime
 from anvil.tables import app_tables
 import anvil.media
-
-
 from datetime import datetime
 from collections import deque
 
-#colecciones para almacenar los datos de las gráficas
-soundLevel     = deque()
-timestamps     = deque()
+# colecciones para almacenar los datos de las gráficas
+soundLevel = deque()
+timestamps = deque()
+
 
 class Form1(Form1Template):
     def init(self, **properties):
@@ -26,6 +25,7 @@ class Form1(Form1Template):
         self.timer_1.interval = 1000  # Configurar el temporizador para que se ejecute cada segundo
         self.timer_1.enabled = True  # Habilitar el temporizador
 
+    # Codigo para el boton Save Sound
     def button_1_click(self, **event_args):
         a = anvil.server.call('calculate_sound_level')
         self.label_5.text = (a)
@@ -33,6 +33,7 @@ class Form1(Form1Template):
         app_tables.sounddatabase.add_row(timeStamp=time, SoundLevel=a)
         self.plot_data()
 
+    # Codigo para el boton Show Danger Level
     def button_3_click(self, **event_args):
         # El boton activa el medidor de riesgo de sonido
         x = anvil.server.call('picodangerLevel')
@@ -45,13 +46,12 @@ class Form1(Form1Template):
         anvil.server.call('useLED')
 
     def timer_1_tick(self, **event_args):
-      global soundLevel
-      global timestamps 
-      timestamp = datetime.now()
-      sound = anvil.server.call('calculate_sound_level')
-      soundLevel.append(sound) 
-      timestamps.append(timestamp)
+        global soundLevel
+        global timestamps
+        timestamp = datetime.now()
+        sound = anvil.server.call_s('calculate_sound_level')
+        soundLevel.append(sound)
+        timestamps.append(timestamp)
 
-      self.plot_1.data = go.Scatter(x=list(timestamps) , y=list(soundLevel))
-      self.plot_1.layout.title = "Sound Level" 
-      """Este método se llama cada segundo. No se activa si [interval] es 0."""
+        self.plot_1.data = go.Scatter(x=list(timestamps), y=list(soundLevel))
+        self.plot_1.layout.title = "Sound Level" 
